@@ -3,3 +3,6 @@ hello : hello.c
 
 clean :
 	rm hello
+
+fortune: fortune.c
+	gcc fortune.c -o fortune
