@@ -22,16 +22,7 @@ int main() {
   char word_array[32];
   //Pointer variable declared to point to allocated heap space.
   char *word_repeat_array = NULL;
-  
-  //Call malloc to allocate the appropriate number of bytes for the array.
-  word_repeat_array = malloc(sizeof(char) * 2048);
-
-  //Checks return value and handles error.
-  if (word_repeat_array == NULL) {
-    printf("Error: malloc has failed.");
-    exit(1);
-  }
-
+ 
   //Asks user for a word input.
   printf("Enter a word: ");
   //Gets user input and assigns to dynamically allocated word_array array.
@@ -41,24 +32,27 @@ int main() {
   printf("Enter a count: ");
   //Gets user input and assigns to repeat variable.
   scanf("%d", &repeat);
+ 
+  //Call malloc to allocate the appropriate number of bytes for the array.
+  word_repeat_array = malloc(sizeof(char) * repeat * strlen(word_array) + 1);
+
+  //Checks return value and handles error.
+  if (word_repeat_array == NULL) {
+    printf("Cannot allocate new string. Exiting...\n");
+    exit(1);
+  }
 
   //Fixed error Conditional jump or move depends on uninitialised value.
   //By initializing the word_repeat_array by strcpy.
   strcpy(word_repeat_array, word_array);
 
-  //if statement to ensure that new string can be allocated within malloc.
-  if ((strlen(word_array) * repeat) < (sizeof(char) * 2048)) {
-    //If string can be allocated, for loop to repeat word n amount of times.
-    for (int i = 0; i < repeat - 1; i++) {
-      //strcat, apends user input word n amount of times in word_repeat_array.
-      strcat(word_repeat_array, word_array);
-    }
-    //Prints the new string with repeated word.
-    printf("%s\n", word_repeat_array);
-  } else {
-    //else, if string cannot be allocated, print:
-    printf("Cannot allocate new string. Exiting...\n");
+  //If string can be allocated, for loop to repeat word n amount of times.
+  for (int i = 0; i < repeat - 1; i++) {
+    //strcat, apends user input word n amount of times in word_repeat_array.
+    strcat(word_repeat_array, word_array);
   }
+  //Prints the new string with repeated word.
+  printf("%s\n", word_repeat_array);
 
   //Frees memory and cleans up array to null.
   free(word_repeat_array);
