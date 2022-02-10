@@ -2,6 +2,7 @@
  * repeat.c
  * Author: Grace Choe
  * Date: 2/3/2022
+ * Edited: 2/10/22
  * 
  * Description:
  * This program asks the user for a string, s, and an integer, n, and then
