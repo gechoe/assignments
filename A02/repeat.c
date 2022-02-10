@@ -21,7 +21,7 @@ int main() {
   char word_array[32];
   //Pointer variable declared to point to allocated heap space.
   char *word_repeat_array = NULL;
-
+  
   //Call malloc to allocate the appropriate number of bytes for the array.
   word_repeat_array = malloc(sizeof(char) * 2048);
 
@@ -41,10 +41,14 @@ int main() {
   //Gets user input and assigns to repeat variable.
   scanf("%d", &repeat);
 
+  //Fixed error Conditional jump or move depends on uninitialised value.
+  //By initializing the word_repeat_array by strcpy.
+  strcpy(word_repeat_array, word_array);
+
   //if statement to ensure that new string can be allocated within malloc.
   if ((strlen(word_array) * repeat) < (sizeof(char) * 2048)) {
     //If string can be allocated, for loop to repeat word n amount of times.
-    for (int i = 0; i < repeat; i++) {
+    for (int i = 0; i < repeat - 1; i++) {
       //strcat, apends user input word n amount of times in word_repeat_array.
       strcat(word_repeat_array, word_array);
     }
