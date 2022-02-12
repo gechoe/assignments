@@ -16,7 +16,7 @@ struct node {
   struct node* next;
 };
 
-// Push a new node to a stack (implemented as a linked list). 
+// Push a new node to a stack (implemented as a linked list).
 // The new node should store the given symbol, line number, and column number
 // Param sym: a character symbol, '{' for this program
 // Param line: the line number of the symbol
@@ -26,7 +26,7 @@ struct node {
 struct node* push(char sym, int line, int col, struct node* top) {
   //Pointer variable declared to point to allocated heap space.
   struct node* new_node = NULL;
-  
+
   //Malloc called to allocate the appropriate space.
   new_node = malloc(sizeof(struct node));
 
@@ -41,7 +41,7 @@ struct node* push(char sym, int line, int col, struct node* top) {
   new_node->linenum = line;
   new_node->colnum = col;
   new_node->next = NULL;
-  
+
   //If top is not null then new_node points to top as new_node is the new "top".
   if (top != NULL) {
     new_node->next = top;
@@ -63,7 +63,7 @@ struct node* pop(struct node* top) {
     printf("Nothing to be popped!");
   } else {
     node = top->next;
-    
+
     free(top);
     top = node;
   }
@@ -80,7 +80,7 @@ void clear(struct node* top) {
   //frees from the top until everything is free'd and nulled.
   while (top != NULL) {
     node = top->next;
-    
+
     free(top);
     top = node;
   }
@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
   if (argv != NULL) {
     file = fopen(argv[1], "r");
   }
-  
+
   //If the commandline input is less then 2 (does not include file name) or
   //greater than 2 (has more than just the program name and filename) then
   //the usage with the program run command is printed out.
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
     printf("usage: %s\n", argv[0]);
     exit(1);
   }
- 
+
   //Handles if file is null.
   if (file == NULL) {
     printf("Cannot open file:  %s\n", argv[1]);
@@ -138,12 +138,12 @@ int main(int argc, char* argv[]) {
       line++; //line incrementor for every new line.
       column = 0; //Resets column every new line.
     }
-  
+
     //If statement for pushing a new node to the "stack" if { is encountered.
     if (char_val == '{') {
       head = push(char_val, line, column, head); //pushes
     }
-    
+
     //If statement for stating if a matching brace was found or not found based
     //on }'s presence.
     if (char_val == '}') {
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
         printf("Unmatched brace on Line %d and Column %d\n", line, column);
       }
     }
-  }  
+  }
 
   //If head is not null by the end, that means there are { leftover, so they are
   //unmatched, and are then popped and printed out until head (stack) is empty.
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
       head->colnum);
     head = pop(head);
   }
- 
+
   //Closes the file.
   fclose(file);
 

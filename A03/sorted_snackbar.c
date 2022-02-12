@@ -18,26 +18,26 @@ struct snack {
   struct snack* next;
 };
 
-// Insert a new node to a list (implemented as a linked list). 
+// Insert a new node to a list (implemented as a linked list).
 // The new node should store the given properties
 // Param snacks: the first item in the list (NULL if empty)
 // Param name: the snack name (max length is 32 characters)
 // Param quantity: the snack quantity
 // Param cost: the snack cost
 // Returns the first item in the list
-struct snack* insert_sorted(struct snack* snacks, const char* name, 
+struct snack* insert_sorted(struct snack* snacks, const char* name,
   int quantity, float cost) {
   struct snack* new_node = NULL;
   struct snack* current_node = snacks;
 
-  //Mallocs new_node, new_node being the new element added to the linked list. 
+  //Mallocs new_node, new_node being the new element added to the linked list.
   new_node = malloc(sizeof(struct snack));
-  
+
   //Checks return value and handles error.
   if (new_node == NULL) {
     printf("ERROR malloc failed!\n");
     exit(1);
-  }  
+  }
 
   //Gives new_node properties based on function param.
   strcpy(new_node->name, name);
@@ -63,7 +63,7 @@ struct snack* insert_sorted(struct snack* snacks, const char* name,
           if (strcmp(new_node->name, current_node->next->name) < 0) {
             new_node->next = current_node->next;
             current_node->next = new_node;
-            break; 
+            break;
           } else {
               current_node = current_node->next;
           }
@@ -75,7 +75,7 @@ struct snack* insert_sorted(struct snack* snacks, const char* name,
   } else {
     snacks = new_node;
   }
-  
+
   return snacks;
 }
 
@@ -83,11 +83,11 @@ struct snack* insert_sorted(struct snack* snacks, const char* name,
 // Param snacks: the first node in the list (NULL if empty)
 void clear(struct snack* snacks) {
   struct snack* node;
-  
+
   //Keeps freeing head as long as head is not null.
   while (snacks != NULL) {
-    node = snacks->next; 
-    
+    node = snacks->next;
+
     free(snacks);
     //Moves head to the next node after freeing the first one.
     snacks = node;
@@ -118,19 +118,19 @@ int main() {
 
     printf("Enter a cost: ");
     scanf("%f", &cost);
-    
+
     printf("Enter a quantity: ");
     scanf("%d", &quantity);
-  
+
     //Puts the snack(s) one at a time into the linked list.
     head = insert_sorted(head, name, quantity, cost);
-    
-    printf("\n"); 
+
+    printf("\n");
   }
 
   struct snack* holder = head;
 
-  printf("Welcome to Grace's GrOoVy Snack Bar! ~(OuO)~\n\n");  
+  printf("Welcome to Grace's GrOoVy Snack Bar! ~(OuO)~\n\n");
 
   //Prints out the snacks in alphabetical order.
   for (int j = 0; j < num_of_snacks; j++) {
@@ -140,8 +140,8 @@ int main() {
     }
     holder = holder->next;
   }
-  
-  //Clears/frees and nulls  everything.
+
+  //Clears/frees and nulls everything.
   clear(head);
 
   return 0;

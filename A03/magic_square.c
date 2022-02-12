@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------
-// magic_square.c 
+// magic_square.c
 // CS223 - Spring 2022
 // Identify whether a matrix is a magic square
 // Name: Grace Choe
@@ -21,7 +21,7 @@ void is_magic_square(int** array, int column) {
     diag_one_total += array[m][m];
     diag_two_total += array[m][column - 1 - m];
   }
-  
+
   //If diagonals are not equal, it is not a square:
   if (diag_one_total != diag_two_total) {
     printf("M is NOT a magic square!\n");
@@ -43,7 +43,7 @@ void is_magic_square(int** array, int column) {
       }
     }
   }
- 
+
   /**
    * Since we know the diagonals' sums equal each other and the rows' sum and
    * columns' sum equals each other, we check if (one from the pair) row equals
@@ -68,14 +68,14 @@ int main() {
   //scans in the first two values (the dimensions of the matrix
   scanf(" %d", &row);
   scanf(" %d", &col);
-  
+
   //Allocates an array of [row amount] pointers to ints
   two_d_array = malloc(sizeof(int *) * row);
 
   //For each row, malloc space is created for its column elements, added to array
   // to make array of arrays (2d array).
   for (int i = 0; i < row; i++) {
-    two_d_array[i] = malloc(sizeof(int) * col);  
+    two_d_array[i] = malloc(sizeof(int) * col);
   }
 
   //Checks return value and handles error.
@@ -83,19 +83,19 @@ int main() {
     printf("ERROR: malloc failed!\n");
     exit(1);
   }
-  
+
   //Inputs each value of given magic square into its appropriate spot in 2d array
   //Value is also printed out appropriately.
   for (int j = 0; j < row; j++) {
     for (int k = 0; k < col; k++) {
       scanf("%d", &val);
       two_d_array[j][k] = val;
-      
+
       printf("%-3d", val);
     }
     printf("\n");
   }
-  
+
   //Checks if magic_square.
   is_magic_square(two_d_array, col);
 
@@ -104,10 +104,10 @@ int main() {
     free(two_d_array[i]);
     two_d_array[i] = NULL;
   }
-  
+
   //Frees the outer array, thus freeing the entire "2d array".
   free(two_d_array);
   two_d_array = NULL;
 
-  return 0;  
+  return 0;
 }
