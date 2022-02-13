@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
   struct node* head = NULL;
 
   //Open the file based on commandline input.
-  if (argv != NULL) {
+  if (argv[1] != NULL) {
     file = fopen(argv[1], "r");
   }
 
