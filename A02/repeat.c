@@ -37,7 +37,7 @@ int main() {
   word_repeat_array = malloc(sizeof(char) * repeat * strlen(word_array) + 1);
 
   //Checks return value and handles error.
-  if (word_repeat_array == NULL) {
+  if ((sizeof(word_repeat_array) < 1) || word_repeat_array == NULL) {
     printf("Cannot allocate new string. Exiting...\n");
     exit(1);
   }
