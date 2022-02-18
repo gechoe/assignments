@@ -69,6 +69,7 @@ struct snack* insert_sorted(struct snack* snacks, const char* name,
           }
         } else {
           current_node->next = new_node;
+          //Fixed code issue by adding break, forgot to add break here:
           break;
         }
       }
