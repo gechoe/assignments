@@ -51,6 +51,9 @@ struct snack* insert_sorted(struct snack* snacks, const char* name,
     //current_node is first set equal to snacks (the head node), but then
     //traverses through the linked list to find the appropriate place to insert
     //new_node.
+    /*if ((strcmp(new_node->name, current_node->name) < 0) {
+      if () {}
+    }*/
     while (current_node != NULL) {
       //new_node is placed before the current_node (head).
       if (strcmp(new_node->name, current_node->name) < 0) {
@@ -65,10 +68,11 @@ struct snack* insert_sorted(struct snack* snacks, const char* name,
             current_node->next = new_node;
             break;
           } else {
-              current_node = current_node->next;
+            current_node = current_node->next;
           }
         } else {
           current_node->next = new_node;
+          break;
         }
       }
     }
