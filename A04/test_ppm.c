@@ -6,7 +6,12 @@
  * Description:
  * This program is a short test that that calls the read_ppm.c function and
  * prints the contents of feep-ascii.ppm (this file name is hard-coded into
- * this test). 
+ * this test).
+ *
+ * IMPORATANT NOTE!
+ * The name of the "feep-ascii.ppm" PPM file is hard-coded in as the printed out
+ * example on the Assignment 4, doesn't show the user inputting a filename, but
+ * rather automatically using feep-ascii.ppm!
  */
 
 #include <stdio.h>
