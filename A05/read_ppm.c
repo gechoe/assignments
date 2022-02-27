@@ -36,10 +36,23 @@ struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
   }
   
   token1 = strtok(s, whitespace);
-  width = atoi(token1);
   
+  if (token1 != NULL) {
+    width = atoi(token1);
+  } else {
+    printf("Error: token1 is NULL\n");
+    exit(1);
+  }
+
   token2 = strtok(NULL, whitespace);
-  height = atoi(token2);
+  
+  if (token2 != NULL) {                                                          
+    height = atoi(token2);                                                        
+  } else {                                                                       
+    printf("Error: token2 is NULL\n");                                             
+    exit(1);                                                                     
+  }
+  //height = atoi(token2);
 
   array = malloc(sizeof(struct ppm_pixel *) * height);
   

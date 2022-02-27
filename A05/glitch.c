@@ -4,11 +4,9 @@
 #include "read_ppm.h"
 
 int main(int argc, char** argv) {
-  //FILE *filew;
   struct ppm_pixel **array;
   int width = 0;
   int height = 0;
-  //char *string = NULL;
   char period[2] = ".";
   unsigned char oldcolorvalue, newcolorvalue;
   char *token;
@@ -23,12 +21,8 @@ int main(int argc, char** argv) {
   array = read_ppm(argv[1], &width, &height);
   printf("Reading %s with width  %d and height %d\n", argv[1], width, height);
 
-  //printf("%d, %d", width, height);
   token = strtok(argv[1], period);
-  
-  //printf("%s", token);
   char name[] = "-glitch.ppm";
-
   strcat(token, name);
   
   for (int i = 0; i < height; i++) {
@@ -43,7 +37,6 @@ int main(int argc, char** argv) {
         }
 
         newcolorvalue = oldcolorvalue << (rand() % 2);
-        //printf("old: %u new:%u\n", oldcolorvalue, newcolorvalue);
 
         if (m == 0) {                                                            
           array[i][j].red = newcolorvalue;                                       
@@ -56,9 +49,13 @@ int main(int argc, char** argv) {
     }
   }
 
-
   write_ppm(token, array, width, height);
   printf("Writing file %s\n", token);
+
+  for (int n = 0; n < height; n++) {
+    free(array[n]);
+    array[n] = NULL;
+  }
 
   free(array);
   array = NULL;
