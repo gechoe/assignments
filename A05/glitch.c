@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
   }
   
   array = read_ppm(argv[1], &width, &height);
-  printf("Reading %s with width  %d and height %d\n", argv[1], width, height); 
+  printf("Reading %s with width %d and height %d\n", argv[1], width, height); 
   
   token = strtok(argv[1], period);
   char name[] = "-glitch.ppm";
