@@ -93,134 +93,53 @@ struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
 // array of arrays
 extern void write_ppm(const char* filename, struct ppm_pixel** pxs, int w, int h) {
   FILE *file_w;
-  int dec, bin, i = 0;
-  int *binary = NULL;
-  int *bin_array = NULL;
-  char s[] = "P6";
-  char s2[] = "255";
-  char space[] = " ";
-  char enter[] = "\n";
-  char nums[100];
-  binary = malloc(sizeof(int) * 1000);
-
-  if (binary == NULL) {
-    printf("Error: malloc failed!\n");
-    exit(1);
-  }
-
-  bin_array = malloc(sizeof(int) * 1000);                                           
-                                                                                 
-  if (bin_array == NULL) {                                                          
-    printf("Error: malloc failed!\n");                                           
-    exit(1);                                                                     
-  }
-
+  char type[3] = "P6";
+  char top[4] = "255";
+  char width[500], height[500];
+  char enter = '\n';
+  
   file_w = fopen(filename, "wb");
 
   if (file_w == NULL) {
-    printf("Cannot find/access file!\n");
+    printf("Error: unable to open file %s\n", filename);
     exit(1);
   }
-  
-  //token = strtok((char*)filename, dash);  
-  //char name[] = ".ppm";
-  //strcat(token, name);
-  
-  //printf("%s\n", token);
 
-  /*file_r = fopen(token, "wb");                                                
-                                                                                 
-  if (file_r == NULL) {                                                          
-    printf("Cannot find/access file!\n");                                        
-    exit(1);                                                                     
-  }*/
+  sprintf(width, "%d", w);
+  sprintf(height, "%d", h);
 
-  //fgets(s, 100, file_r);
-  //s = "P6";
-  fwrite(s, sizeof(s), 1, file_w);
-  fwrite(space, sizeof(space), 1, file_w); 
-  //fprintf(file_w, "\n");
+  strcat(width, " ");
+  strcat(width, height);
 
-  //fgets(s, 100, file_r);
-  //fwrite(s, 1, sizeof(s), file_w);
-  
-  /*while (s[0] == '#') {
-    fgets(s, 100, file_r);
-    fwrite(s, 1, sizeof(s), file_w);
-  }*/
- 
-    //fgets(s, 100, file_r);
-    sprintf(nums, "%d", w);
-    fwrite(&w, sizeof(s), 1, file_w);
-    fwrite(space, sizeof(space), 1, file_w);
-    //fprintf(file_w, " ");
-  
-    //fgets(s, 100, file_r);
-    sprintf(nums, "%d", h);
-    fwrite(&h, sizeof(s), 1, file_w);
-    fwrite(enter, sizeof(enter), 1, file_w);
-    //fprintf(file_w, "\n");
-    
-    fwrite(s2, sizeof(s), 1, file_w);
-
-  for (int j = 0; j < h; j++) {
-    for (int k = 0; k < w; k++) {
-      for (int m = 0; m < 3; m++) {
-        if (m == 0) {
-          //length = strlen(pxs[j][k].red);
-          //printf("%d", pxs[j][k].red);
-          dec = (pxs[j][k].red) - '0';
-        } else if (m == 1) {
-          //length = strlen(pxs[j][k].green);
-          dec = (pxs[j][k].green) - '0';
-        } else {
-          //length = strlen(pxs[j][k].blue);
-          dec = (pxs[j][k].blue) - '0';
-        }
-      //dec = pxs[j][k] - '0';
-        
-        //binary = malloc(sizeof(int) * 1000);
-
-        while (dec > 0) {
-          bin = dec % 2;
-          dec /= 2;
-  
-          //fwrite(&bin, 4, sizeof(dec), file);
-          binary[i] = bin;
-          i++;
-        }
-        
-        int n = 0;
-
-        for (int j = (i - 1); j >= 0; j--)
-        {
-            bin_array[j] = binary[n];
-            n++;
-        }
-        
-        fwrite(&bin_array, sizeof(bin_array), 1, file_w);
-        fprintf(file_w, " ");
-        //fwrite(&space, 1, sizeof(space), file); 
-        i = 0;
-      }
+  for (int i = 0; i < strlen(type); i++) {
+    if (type[i] != '\0') {
+      fwrite(&type[i], sizeof(type[i]), 1, file_w);
     }
   }
 
-  
-  free(binary);
-  binary = NULL;
-  
-  //free(s);
-  //s = NULL;
+  fwrite(&enter, sizeof(enter), 1, file_w);
 
-  free(bin_array);
-  bin_array = NULL;
-  
-  //*w = width;
-  //*h = height;
-  
-  //fclose(file_r);
+  for (int i = 0; i < strlen(width); i++) {                                       
+    if (width[i] != '\0') {                                                       
+      fwrite(&width[i], sizeof(width[i]), 1, file_w);                               
+    }                                                                            
+  }
+
+  fwrite(&enter, sizeof(enter), 1, file_w);
+
+  for (int i = 0; i < strlen(top); i++) {                                       
+    if (top[i] != '\0') {                                                       
+      fwrite(&top[i], sizeof(top[i]), 1, file_w);                               
+    }                                                                            
+  }
+
+  fwrite(&enter, sizeof(enter), 1, file_w);
+
+  for (int i = 0; i < h; i++) {
+    for (int j = 0; j < w; j++) {
+      fwrite(&pxs[i][j], sizeof(pxs[i][j]), 1, file_w);
+    }
+  }
+
   fclose(file_w);
-
-  //return array;
 }
