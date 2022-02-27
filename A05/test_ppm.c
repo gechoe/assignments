@@ -1,7 +1,19 @@
+/**
+ * test_ppm.c
+ * Author: Grace Choe
+ * Date: 2/24/2022
+ *
+ * Description:
+ * This program is a short test that that calls the read_ppm.c function and
+ * prints the contents of feep-raw.ppm (this file name is hard-coded into
+ * this test).
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "read_ppm.h"
 
+//main function
 int main(int argc, char** argv) {
   //Creates a struct 2D array called array_test.
   struct ppm_pixel **array_test;
@@ -10,10 +22,10 @@ int main(int argc, char** argv) {
   int width = 0;
   int height = 0;
   
-  //Uses the function read_ppm() with the filename (string) input and width 
+  //Uses the function read_ppm() with the filename (string) input and width
   //and height inputs.
   array_test = read_ppm(string, &width, &height);
-
+  
   //Prints the filename and the width and height.
   printf("Testing file %s: %d %d\n", string, width, height);
   
@@ -23,7 +35,7 @@ int main(int argc, char** argv) {
       printf("(%d,%d,%d) ", array_test[i][j].red, array_test[i][j].green,
         array_test[i][j].blue);
     }
-
+    
     //Frees the arrays within the arrays in the 2D array.
     free(array_test[i]);
     array_test[i] = NULL;
@@ -33,6 +45,6 @@ int main(int argc, char** argv) {
   //Frees the remaining arrays of the remnants of the 2D array.
   free(array_test);
   array_test = NULL;
-
+  
   return 0;
 }
