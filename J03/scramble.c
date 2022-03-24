@@ -5,25 +5,27 @@
 int main() {
   char phrase[100];
   printf("Please enter a phrase: ");
-  scanf("%s", phrase);
+  fgets(phrase, sizeof(phrase), stdin);
   char retString[100];
 
   for (int i = 0; i < strlen(phrase); i++) {
-    unsigned int letter = phrase[i];
-    unsigned int mask1 = 0x0F00;
-    unsigned int mask2 = 0x00F0;
-    unsigned int mask3 = 0xF00F;
-    unsigned int first = letter & mask1;
-    unsigned int second = letter & mask2;
-    unsigned int third = letter & mask3;
-    unsigned int shiftl = second >> 1;
-    unsigned int shiftr = first << 1;
-    unsigned flipped = (shiftr | shiftl) | third;
-
+    unsigned char letter = phrase[i];
+    unsigned char mask2 = 0x2;
+    unsigned char mask3 = 0x4;
+    mask2 = letter & mask2;
+    unsigned char maskout2 = letter ^ mask2;
+    mask2 = mask2 << 1;
+    mask3 = letter & mask3;
+    unsigned char maskout3 = letter ^ mask3;
+    mask3 = mask3 >> 1;
+    unsigned char mask = mask2 | mask3;
+    unsigned char maskout = maskout2 & maskout3;
+    unsigned char flipped = maskout ^ mask;
     retString[i] = flipped;
   }
 
+  retString[strlen(phrase)] = '\0';
   printf("scramble: %s\n", retString);
-
+ 
   return 0;
 }
