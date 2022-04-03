@@ -23,6 +23,7 @@ int main (int argc, char* argv[]) {
         fprintf(stderr, "malloc failed\n");
         return(1);
       } 
+      /* writing to the memory so we know it exists */
       *memory = 123;
       free(memory);
     }

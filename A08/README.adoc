@@ -1,21 +1,33 @@
 = Hardware specifications
 
 Where did your run your tests? A laptop, or goldengate?
-
+  I ran my tests on goldengate.
 
 What are the performance specifications of the machine: number and speed of
 processors, size of RAM? (use `lscpu` and `free -m`)
-
+  Number of processors: 64
+  Speed of processors: 1200.063 MHz
+  Size of RAM: 97608472 kB or about 97 GB 
 
 = Allocations
 
 In `simple.c`, where does the increase in 1040 bytes come from?
 Why is the value 1040 bytes?
-
+  The increase in 1040 bytes comes from the buffer along with the pointers for
+  the two sbrk(0) calls, *init and *current. The value is 1040 bytes because the
+  buffer is 1024 bytes in size and each pointer is 8 bytes in size.
+  So, 1024 bytes + 8 bytes + 8 bytes = 1040 bytes, which is what is/gets printed
+  out.
 
 How many bytes does `mylloc_list.c` allocate when the program ends? Explain why
 this amount makes sense.
-
+  'mylloc_list.c' allocates 116 bytes total. 100 bytes comes from the allocation
+  of the char *letters, where it allocates the heap memory for storing that much
+  space. The amount of space is calculated by the designated size, 100,
+  multiplied to the type's size, char being 1 byte, so: 100 bytes * 1 byte = 
+  100 bytes. The remaining 16 bytes come from 
+  
+  'mylloc_list.c' 
 
 = Fragementation
 
