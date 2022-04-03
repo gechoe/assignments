@@ -21,6 +21,7 @@ int main ( int argc, char* argv[]) {
 
   void *init = sbrk(0);
   void *current;
+
   printf("The initial top of the heap is %p.\n", init);
   for (int j = 0 ; j < ROUNDS; j++) {
     for (int i= 0 ; i < LOOP ; i++) {

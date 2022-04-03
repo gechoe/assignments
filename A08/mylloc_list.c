@@ -9,7 +9,7 @@ struct chunk {
 };
 
 struct chunk *flist = NULL;
-int total = 1, ub = 0;
+int total = 0, freed = 0, used = 0;
 
 void *malloc (size_t size) {
   if (size == 0){
@@ -24,10 +24,12 @@ void *malloc (size_t size) {
 
     if (next->size >= size) {
       if (prev != NULL) {
-        next->mem_used = size; /////////
+        next->mem_used = size;
         prev->next = next->next;
+        freed++;
       } else {
         flist = next->next;
+        used++;
       }
       return (void*)(next + 1);
     } else {
@@ -56,75 +58,90 @@ void free(void *memory) {
     cnk->next = flist;
     cnk->mem_used = 0;
     flist = cnk;
-    //cnk->mem_used = 0;
+    freed++;
+    cnk->mem_used = 0;
   }
 
   return;
 }
 
 void fragstats(void* buffers[], int len) {
-  //void *init = sbrk(0);
-  struct chunk *cnk = flist;  
-  //struct chunk *smallest;
-  //struct chunk *largest;
-  //int i = 0;
+  int l = 0, mem = 0, memm, mem_total = 0, large, small;
 
-  int total = 0, used = 0;
-  int largest, smallest;
-  int i = 0;
-  int unt = 0, unu = 0;
+  for (int k = 0; k < len; k++) {
+    if (buffers[k]) {
+      l++;
+      mem = *((int*)buffers[k]);
+      mem_total += mem;
+      
+      if (k == 0) {
+        memm = mem;
+      }
+      if (mem < memm) {
+        if (memm >= large) {
+          large = memm;
+        }
+        if (mem <= small) {
+          small = mem;
+        }
+      } else if (mem > memm) {
+        if (mem >= large) {
+          large = mem;
+        }
+        if (memm <= small) {
+          small = memm;
+        }
+      } else {
+        small = mem;
+        large = mem;
+      }
+    }
+    memm = mem;
+  }
+  float aver = mem_total / l;
+ 
+  struct chunk *cnk = flist, *prev = NULL;
+  int largest, smallest, i = 0, unt = 0, unu;
 
   while (cnk != NULL) {
     i++;
-    //int x = (cnk->size);
-    //int x = *(buffers[i]->size);
-    total = total + (cnk->size);
-    used = used + (cnk->mem_used);
     
     int t = cnk->size;
     int u = cnk->mem_used;
     int un = t - u;
-    
-    if (un >= unu) {
-      largest = un;
-      smallest = unu;
+
+    if (prev != NULL) {
+      if (un <= unu) {
+        if (unu >= largest) {
+          largest = unu;
+        }
+        if (un <= smallest) {
+          smallest = un;
+        }
+      } else {
+        if (un >= largest) {
+          largest = un;
+        }
+        if (unu <= smallest) {
+          smallest = unu;
+        }
+      }
     } else {
-      largest = unu;
       smallest = un;
+      largest = un;
     }
-    
+
     unu = un;
     unt += un;
     
+    prev = cnk;
     cnk = cnk->next;
   }
   
-  int unused = total - used;
   float av = unt / i;  
-
-  printf("unused memory total: %d %d, average: %.1f, smallest: %d, largest: %d\n",
-     unt, unused, av, smallest, largest);
-  printf("total: %d\n", total);
-  //printf("%ld  %d  %d\n", sizeof(*(buffers)), len, tb);  
-
-/*  void *cnk = flist;
-  //t = total, ft = freed total, ut = used total
-  int t = 0, ft = 0, ut = 0;
-  //it = increased total, i
-
-  for (int i = 0; i < len; i++) {
-    t += buffers[i]->size;
-    ut += cnk->mem_used;
-  }
-
-  //external linked list
-  //internal buffers
-  while (cnk != NULL) {
-    t += cnk->size;
-    ut += cnk->mem_used;
-  }
-
-  ft = t - ut;
-   
-  printf("Total blocks: %d Free: %d Used: %d\n", t, ft, ut); 
-*/}
+  printf("Total blocks: %d Free: %d Used: %d\n", (i + l), i, l);
+  printf("External unused: total: %d, average: %.1f, smallest: %d, largest: %d\n",
+     mem_total, aver, small, large);
+  printf("Internal unused: total: %d, average: %.1f, smallest: %d, largest: %d\n",
+     unt, av, smallest, largest);
+}

@@ -25,9 +25,89 @@ this amount makes sense.
   of the char *letters, where it allocates the heap memory for storing that much
   space. The amount of space is calculated by the designated size, 100,
   multiplied to the type's size, char being 1 byte, so: 100 bytes * 1 byte = 
-  100 bytes. The remaining 16 bytes come from 
+  100 bytes. The remaining 16 bytes come from how malloc functions to pad out
+  the memory allocated in terms of 8 bytes. This padding costs 16 bytes, so then
+  100 bytes + 16 bytes = 116 bytes total.
   
   'mylloc_list.c' 
 
 = Fragementation
 
+What is fragmentation? What is the difference between internal and external
+fragmentation?
+  Fragmentation is when a memory allocation fails due to the specified amount of
+  memory asked to be allocated being greater than the continguous block/chunk
+  available or when memory is allocated in a large number of blocks/chunks 
+  leaving a lot of the total memory unallocated, creating memory exceptions or
+  allocation errors. The differences between internal and external fragmentation
+  is that internal fragmentation is when the memory space is larger than what is
+  requested, so there is space in a block/chunk that is unused so the chunks are
+  too large. On the other hand, opposite to internal, external fragmentation is
+  when the chunks are too small. Where the chunks are divided into too many small
+  chunks thateven with a lot of free space, the memory allocation won't work due
+  to the small chunks making it non-continguous. (A solution to these
+  fragmentations being splitting andi/or merging.)
+
+Include your output in the README.adoc
+  My output for benchmark2 is:
+The initial top of the heap is 0x7fcba6da6000.
+Total blocks: 161 Free: 103 Used: 58
+External unused: total: 7134, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 144345, average: 1401.0, smallest: 10, largest: 3984
+0
+The current top of the heap is 0x7fcba6dfc527.
+Increased by 345 (0x159) Kbyte
+Total blocks: 167 Free: 113 Used: 54
+External unused: total: 6642, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 177549, average: 1571.0, smallest: 10, largest: 3984
+1
+The current top of the heap is 0x7fcba6e02327.
+Increased by 368 (0x170) Kbyte
+Total blocks: 169 Free: 117 Used: 52
+External unused: total: 6396, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 189341, average: 1618.0, smallest: 10, largest: 3997
+2
+The current top of the heap is 0x7fcba6e04282.
+Increased by 376 (0x178) Kbyte
+Total blocks: 172 Free: 120 Used: 52
+External unused: total: 6396, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 201235, average: 1676.0, smallest: 10, largest: 3998
+3
+The current top of the heap is 0x7fcba6e07188.
+Increased by 388 (0x184) Kbyte
+Total blocks: 175 Free: 125 Used: 50
+External unused: total: 6150, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 222205, average: 1777.0, smallest: 10, largest: 3999
+4
+The current top of the heap is 0x7fcba6e0a095.
+Increased by 400 (0x190) Kbyte
+Total blocks: 176 Free: 116 Used: 60
+External unused: total: 7380, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 189140, average: 1630.0, smallest: 10, largest: 3999
+5
+The current top of the heap is 0x7fcba6e0b045.
+Increased by 404 (0x194) Kbyte
+Total blocks: 176 Free: 128 Used: 48
+External unused: total: 5904, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 227231, average: 1775.0, smallest: 10, largest: 4000
+6
+The current top of the heap is 0x7fcba6e0b045.
+Increased by 404 (0x194) Kbyte
+Total blocks: 177 Free: 125 Used: 52
+External unused: total: 6396, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 219943, average: 1759.0, smallest: 10, largest: 3999
+7
+The current top of the heap is 0x7fcba6e0bff5.
+Increased by 407 (0x197) Kbyte
+Total blocks: 178 Free: 118 Used: 60
+External unused: total: 7380, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 193697, average: 1641.0, smallest: 10, largest: 4000
+8
+The current top of the heap is 0x7fcba6e0cfa5.
+Increased by 411 (0x19b) Kbyte
+Total blocks: 178 Free: 130 Used: 48
+External unused: total: 5904, average: 123.0, smallest: 123, largest: 123
+Internal unused: total: 237661, average: 1828.0, smallest: 10, largest: 4000
+9
+The current top of the heap is 0x7fcba6e0cfa5.
+Increased by 411 (0x19b) Kbyte  
