@@ -100,8 +100,8 @@ int main(int argc, char* argv[]) {
   int colorr, colorg, colorb, black = 0;
   float xtmp = 0; //x = 0, y = 0;
 
-  for (int j = 0; j < size; j++) {
-    for (int k = 0; k < size; k++) {
+  for (int k = 0; k < size; k++) {
+    for (int j = 0; j < size; j++) {
       //should this be size / (size * size)?
       float xfrac = (float) j / (float)size;
       float yfrac = (float) k / (float)size;
