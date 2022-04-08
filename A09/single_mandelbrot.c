@@ -4,7 +4,10 @@
  * Date: 4/6/2022
  *
  * Description:
- * This program writes a mandelbrot ppm file. 
+ * This program writes a mandelbrot png file.
+ * 
+ * NOTE:
+ * May take a few seconds to create the file, so please wait a bit!
  */
 
 #include <stdio.h>
@@ -39,7 +42,7 @@ int main(int argc, char* argv[]) {
   printf("  Y range = [%.4f,%.4f]\n", ymin, ymax);
 
   // todo: your work here
-  //Creates file name  
+  //file name parts
   char name[100] = "mandelbrot-";
   char *dash = "-";
   char sizelet[4];
@@ -49,16 +52,17 @@ int main(int argc, char* argv[]) {
   char current[11];
   sprintf(current, "%d", (int)timenow);
 
-  printf("size: %s  current: %s\n", sizelet, current);
-
+  //Creates file name
   strcat(name, sizelet);
   strcat(name, dash);
   strcat(name, current);
   strcat(name, png);
  
-  // generate pallet
+  // generate palette
+  //Sets a random seed to ensure that the color palette is different each time
   srand(time(0));  
   
+  //palette array to hold palette colors
   struct ppm_pixel *palette;
   palette = malloc(sizeof(struct ppm_pixel *) * (maxIterations + 20));
   
@@ -67,6 +71,7 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
+  //Sets the palette up with certain colors
   for (int q = 0; q < maxIterations; q++) {
     int red = rand() % 255;
     int green = rand() % 255;
@@ -77,15 +82,11 @@ int main(int argc, char* argv[]) {
     palette[q].blue = blue; 
   }
 
-  double timer;
-  struct timeval tstart, tend;
-
-  //The start time, gets the time for before the mandelbrot (array/png) is made
-  gettimeofday(&tstart, NULL);
-
   // compute image
+  //2d array to hold the mandelbrot fractal's pixel values
   struct ppm_pixel **array;
 
+  //malloc of the array
   array = malloc(sizeof(struct ppm_pixel *) * size);
   
   for (int i = 0; i < size; i++) {
@@ -97,12 +98,19 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
-  int colorr, colorg, colorb, black = 0;
-  float xtmp = 0; //x = 0, y = 0;
+  double timer;
+  struct timeval tstart, tend;
 
+  //The start time, gets the time for before the mandelbrot (array/png) is made
+  gettimeofday(&tstart, NULL);
+
+  int colorr, colorg, colorb, black = 0;
+  float xtmp = 0;
+
+  //For loop within for loop to assign red, green, blue pixel colors for each
+  //pixel
   for (int j = 0; j < size; j++) {
     for (int k = 0; k < size; k++) {
-      //should this be size / (size * size)?
       float xfrac = (float) k / (float)size;
       float yfrac = (float) j / (float)size;
       
@@ -111,46 +119,39 @@ int main(int argc, char* argv[]) {
       float x = 0, y = 0;
       int iter = 0;
       
+      //while loop creates the fractal like image by assigning a certain iter
+      //value which is then used to compute the pixel colors
       while ((iter < maxIterations) && ((x * x + y * y) < (2 * 2))) {
-        //float xtmp 
         xtmp = (x * x) - (y * y) + x0;
         y = (2 * x * y) + y0;
         x = xtmp;
-        //printf("iter: %d  x: %f   y: %f\n", iter, x, y);
-        iter = iter + 1;
-        //iter++;
-//        printf("iter: %d  x: %f   y: %f\n", iter, x, y);
+        iter++;
       }
 
-      if (iter < maxIterations) {//escaped
-        //array[j][k].red = palette[iter].red;
-        //array[j][k].green = palette[iter].green;
-        //array[j][k].blue = palette[iter].blue;
+      //Computes the colors for red, green, and blue
+      if (iter < maxIterations) {
         colorr = palette[iter].red;
         colorg = palette[iter].green;
         colorb = palette[iter].blue;
       } else {
-        //array[j][k].red = black;
-        //array[j][k].green = black;
-        //array[j][k].blue = black;
         colorr = black;
         colorg = black;
         colorb = black;
       }
 
+      //write color to image at location (row, col)
       array[j][k].red = colorr;
       array[j][k].green = colorg;
       array[j][k].blue = colorb;
-      //write color to image at location (row, col)
-      //array[j][k] = (struct ppm_pixel)color; 
     }
   }
 
-  write_ppm(name, array, size, size);
-  
-  //The end time, gets the time for after the mandelbrot (array/png) is made
+  //The end time, gets the time for after the mandelbrot array is made
   gettimeofday(&tend, NULL);
 
+  //Write the computed mandelbrot into a png file
+  write_ppm(name, array, size, size);
+  
   //timer, calculates the total time the process took
   timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
   printf("Computer mandelbrot set (%dx%d) in %g seconds\n", size, size, timer);
@@ -166,6 +167,7 @@ int main(int argc, char* argv[]) {
   free(array);
   array = NULL;
 
+  //Frees the palette array
   free(palette);
   palette = NULL;
 
