@@ -97,7 +97,8 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
-  int iter = 0, colorr, colorg, colorb, black = 0;
+  int colorr, colorg, colorb, black = 0;
+  //float x = 0, y = 0;
 
   for (int j = 0; j < size; j++) {
     for (int k = 0; k < size; k++) {
@@ -107,12 +108,10 @@ int main(int argc, char* argv[]) {
       
       float x0 = xmin + xfrac * (xmax - xmin);
       float y0 = ymin + yfrac * (ymax - ymin);
-
-      float x = 0;
-      float y = 0;
-      //int iter = 0;
+      float x = 0, y = 0;
+      int iter = 0;
       
-      while ((iter < maxIterations) && ((x * x + y * y) < (2 * 2))) {
+      while ((iter < maxIterations) && (((x * x) + (y * y)) < (size * size))) {
         float xtmp = x * x - y * y + x0;
         y = 2 * x * y + y0;
         x = xtmp;
