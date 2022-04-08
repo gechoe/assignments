@@ -98,26 +98,28 @@ int main(int argc, char* argv[]) {
   }
 
   int colorr, colorg, colorb, black = 0;
-  //float x = 0, y = 0;
+  float xtmp = 0; //x = 0, y = 0;
 
   for (int j = 0; j < size; j++) {
     for (int k = 0; k < size; k++) {
       //should this be size / (size * size)?
-      float xfrac = size / (size * size);
-      float yfrac = size / (size * size);
+      float xfrac = size / size;
+      float yfrac = size / size;
       
       float x0 = xmin + xfrac * (xmax - xmin);
       float y0 = ymin + yfrac * (ymax - ymin);
       float x = 0, y = 0;
       int iter = 0;
       
-      while ((iter < maxIterations) && (((x * x) + (y * y)) < (size * size))) {
-        float xtmp = x * x - y * y + x0;
-        y = 2 * x * y + y0;
+      while ((iter < maxIterations) && ((x * x + y * y) < (2 * 2))) {
+        //float xtmp 
+        xtmp = (x * x) - (y * y) + x0;
+        y = (2 * x * y) + y0;
         x = xtmp;
-        printf("iter: %d\n", iter);
-
-        iter++;
+        //printf("iter: %d  x: %f   y: %f\n", iter, x, y);
+        iter = iter + 1;
+        //iter++;
+        printf("iter: %d  x: %f   y: %f\n", iter, x, y);
       }
 
       if (iter < maxIterations) {//escaped
