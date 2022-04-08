@@ -103,8 +103,8 @@ int main(int argc, char* argv[]) {
   for (int j = 0; j < size; j++) {
     for (int k = 0; k < size; k++) {
       //should this be size / (size * size)?
-      float xfrac = size / size;
-      float yfrac = size / size;
+      float xfrac = (float)size / (float)size;
+      float yfrac = (float)size / (float)size;
       
       float x0 = xmin + xfrac * (xmax - xmin);
       float y0 = ymin + yfrac * (ymax - ymin);
