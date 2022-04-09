@@ -5,9 +5,6 @@
  *
  * Description:
  * This program writes a mandelbrot png file.
- * 
- * NOTE:
- * May take a few seconds to create the file, so please wait a bit!
  */
 
 #include <stdio.h>
