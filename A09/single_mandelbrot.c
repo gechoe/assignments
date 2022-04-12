@@ -42,9 +42,9 @@ int main(int argc, char* argv[]) {
   //file name parts
   char name[100] = "mandelbrot-";
   char *dash = "-";
-  char sizelet[4];
+  char sizelet[100];
   sprintf(sizelet, "%d", size);
-  char png[] = ".png";
+  char png[] = ".ppm";
   time_t timenow = time(0);
   char current[11];
   sprintf(current, "%d", (int)timenow);
