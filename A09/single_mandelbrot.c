@@ -15,6 +15,59 @@
 #include <sys/time.h>
 #include "read_ppm.h"
 
+struct ppm_pixel** make_array(struct ppm_pixel* pal, struct ppm_pixel** arr, 
+  int startr, int endr, int startc, int endc) {
+  int size = 480;
+  float xmin = -2.0;
+  float xmax = 0.47;
+  float ymin = -1.12;
+  float ymax = 1.12;
+  int maxIterations = 1000;
+  int colorr, colorg, colorb, black = 0;
+  float xtmp = 0;
+
+  //For loop within for loop to assign red, green, blue pixel colors for each
+  //pixel
+  for (int j = startr; j < endr; j++) {
+    for (int k = startc; k < endc; k++) {
+      float xfrac = (float) k / (float)size;
+      float yfrac = (float) j / (float)size;
+      
+      float x0 = xmin + xfrac * (xmax - xmin);
+      float y0 = ymin + yfrac * (ymax - ymin);
+      float x = 0, y = 0;
+      int iter = 0;
+      
+      //while loop creates the fractal like image by assigning a certain iter
+      //value which is then used to compute the pixel colors
+      while ((iter < maxIterations) && ((x * x + y * y) < (2 * 2))) {
+        xtmp = (x * x) - (y * y) + x0;
+        y = (2 * x * y) + y0;
+        x = xtmp;
+        iter++;
+      }
+
+      //Computes the colors for red, green, and blue
+      if (iter < maxIterations) {
+        colorr = pal[iter].red;
+        colorg = pal[iter].green;
+        colorb = pal[iter].blue;
+      } else {
+        colorr = black;
+        colorg = black;
+        colorb = black;
+      }
+
+      //write color to image at location (row, col)
+      arr[j][k].red = colorr;
+      arr[j][k].green = colorg;
+      arr[j][k].blue = colorb;
+    }
+  }
+ 
+  return arr;
+}
+
 int main(int argc, char* argv[]) {
   int size = 480;
   float xmin = -2.0;
@@ -101,47 +154,8 @@ int main(int argc, char* argv[]) {
   //The start time, gets the time for before the mandelbrot (array/png) is made
   gettimeofday(&tstart, NULL);
 
-  int colorr, colorg, colorb, black = 0;
-  float xtmp = 0;
-
-  //For loop within for loop to assign red, green, blue pixel colors for each
-  //pixel
-  for (int j = 0; j < size; j++) {
-    for (int k = 0; k < size; k++) {
-      float xfrac = (float) k / (float)size;
-      float yfrac = (float) j / (float)size;
-      
-      float x0 = xmin + xfrac * (xmax - xmin);
-      float y0 = ymin + yfrac * (ymax - ymin);
-      float x = 0, y = 0;
-      int iter = 0;
-      
-      //while loop creates the fractal like image by assigning a certain iter
-      //value which is then used to compute the pixel colors
-      while ((iter < maxIterations) && ((x * x + y * y) < (2 * 2))) {
-        xtmp = (x * x) - (y * y) + x0;
-        y = (2 * x * y) + y0;
-        x = xtmp;
-        iter++;
-      }
-
-      //Computes the colors for red, green, and blue
-      if (iter < maxIterations) {
-        colorr = palette[iter].red;
-        colorg = palette[iter].green;
-        colorb = palette[iter].blue;
-      } else {
-        colorr = black;
-        colorg = black;
-        colorb = black;
-      }
-
-      //write color to image at location (row, col)
-      array[j][k].red = colorr;
-      array[j][k].green = colorg;
-      array[j][k].blue = colorb;
-    }
-  }
+  int start = 0, end = 480;
+  array = make_array(palette, array, start, end, start, end);
 
   //The end time, gets the time for after the mandelbrot array is made
   gettimeofday(&tend, NULL);
