@@ -15,6 +15,7 @@
 #include <sys/time.h>
 #include "read_ppm.h"
 
+//make_array function, computes mandelbrot set
 struct ppm_pixel** make_array(struct ppm_pixel* pal, struct ppm_pixel** arr, 
   int startr, int endr, int startc, int endc) {
   int size = 480;
@@ -155,6 +156,7 @@ int main(int argc, char* argv[]) {
   gettimeofday(&tstart, NULL);
 
   int start = 0, end = 480;
+  //Calls make_array function to create mandelbrot and store in array
   array = make_array(palette, array, start, end, start, end);
 
   //The end time, gets the time for after the mandelbrot array is made
