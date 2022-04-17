@@ -130,18 +130,16 @@ int main(int argc, char* argv[]) {
   }
 
   // compute image
-  //2d array to hold the mandelbrot fractal's pixel values
-  //struct ppm_pixel **array;
- 
   //Creating space for shared memory to hold 2d array for child processes 
   int shmid, shmid2;
-  shmid = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel*) * (size + 10), 0644 | IPC_CREAT);
+  shmid = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel*) * (size + 100), 0644 | IPC_CREAT);
 
   if (shmid == -1) {
     perror("Error: Cannot initialize shared memory!\n");
     exit(1);
   }
-  
+ 
+  //2d array to hold the mandelbrot fractal's pixel values 
   struct ppm_pixel** array = shmat(shmid, NULL, 0);
   
   if (*array == (void*) -1) {
@@ -150,7 +148,7 @@ int main(int argc, char* argv[]) {
   }
 
   for (int w = 0; w < size; w++) {
-    shmid2 = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel) * (size + 10), 0644 | IPC_CREAT);
+    shmid2 = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel) * (size + 100), 0644 | IPC_CREAT);
     array[w] = shmat(shmid2, NULL, 0);
     if (shmid == -1) {
       perror("Error: Cannot initialize shared memory!\n");
@@ -200,8 +198,6 @@ int main(int argc, char* argv[]) {
       printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n",
         pid, startr, endr, startc, endc);
     }
-    //printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n",
-      //pid, startr, endr, startc, endc);
   }
 
   for (int z = 0; z < 4; z++) {
@@ -220,33 +216,23 @@ int main(int argc, char* argv[]) {
   for (int m = 0; m < size; m++) {
     if (shmdt(array[m]) == -1) {
       perror("Error: Cannot detach from shared memory!\n");
-      //exit(1);
-    }/* else if (shmdt(array[m]) == 0) {
-      if (shmctl(shmid2, IPC_RMID, 0) == -1) {
-      perror("nott Error: Cannot remove shared memory!\n");
-      //exit(1);
-      }
-    }*/
+      exit(1);
+    }
   }
 
-  for (int n = 0; n < (size + 10); n++) {
-    //shmctl(shmid2, IPC_RMID, 0);
-
-    if (shmctl(shmid2, IPC_RMID, 0) == -1) {
+  if (shmctl(shmid2, IPC_RMID, 0) == -1) {
     perror("nott Error: Cannot remove shared memory!\n");
-    //exit(1);
-    }
-
+    exit(1);
   }
 
   if(shmdt(array) == -1) {
     perror("huh Error: Cannot detach from shared memory!\n");
-    //exit(1);
+    exit(1);
   }
 
   if (shmctl(shmid, IPC_RMID, 0) == -1) {
     perror("ok Error: Cannot remove shared memory!\n");
-    //exit(1);
+    exit(1);
   }
 
   //timer, calculates the total time the process took
