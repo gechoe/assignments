@@ -28,13 +28,13 @@ the amount of time it takes to compute each image.
 
 Run your executable, `multi_mandelbrot`, with the following sizes and record
 the amount of time it takes to compute each image.
-
+  Extra: For the given size of 480, the time it took was: 3.79533 seconds
 [cols="1,1"]
 !===
 | Size | Time (s)
-| 100 | todo
-| 400 | todo
-| 800 | todo
-| 1000 | todo
-| 2000 | todo
+| 100 | 0.20624 s
+| 400 | 2.51127 s
+| 800 | 9.82337 s
+| 1000 | 16.75361 s
+| 2000 | 41.12795 s
 !===
