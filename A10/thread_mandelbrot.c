@@ -1,3 +1,13 @@
+/**
+ * thread_mandelbrot.c
+ * Author: Grace Choe
+ * Date: 4/22/2022
+ *
+ * Description:
+ * This program computes and outputs a PPM image of the mandelbrot set using
+ * threads.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,10 +18,19 @@
 #include <pthread.h>
 #include "read_ppm.h"
 
-//make_array function, computes mandelbrot set
-struct ppm_pixel** make_array(struct ppm_pixel* pal, struct ppm_pixel** arr, 
-  int startr, int endr, int startc, int endc) {
-  int size = 1000;
+//struct for each thread, that way multiple arguents can be taken in pthread_create
+struct thread_data {
+  struct ppm_pixel* pal;
+  struct ppm_pixel** arr;
+  int sr;
+  int er;
+  int sc;
+  int ec;
+};
+
+//make_array thread's "main" function, computes mandelbrot set portion
+void *make_array(void *data) {
+  int size = 480;
   float xmin = -2.0;
   float xmax = 0.47;
   float ymin = -1.12;
@@ -19,11 +38,16 @@ struct ppm_pixel** make_array(struct ppm_pixel* pal, struct ppm_pixel** arr,
   int maxIterations = 1000;
   int colorr, colorg, colorb, black = 0;
   float xtmp = 0;
-
+  
+  struct thread_data *info = (struct thread_data *) data;
+  
+  printf("Thread %lu) sub-image block: cols (%d, %d) to rows (%d, %d)\n",
+    pthread_self(), info->sr, info->er, info->sc, info->ec);
+  
   //For loop within for loop to assign red, green, blue pixel colors for each
   //pixel
-  for (int j = startr; j < endr; j++) {
-    for (int k = startc; k < endc; k++) {
+  for (int j = info->sr; j < info->er; j++) {
+    for (int k = info->sc; k < info->ec; k++) {
       float xfrac = (float) k / (float)size;
       float yfrac = (float) j / (float)size;
       
@@ -43,9 +67,9 @@ struct ppm_pixel** make_array(struct ppm_pixel* pal, struct ppm_pixel** arr,
 
       //Computes the colors for red, green, and blue
       if (iter < maxIterations) {
-        colorr = pal[iter].red;
-        colorg = pal[iter].green;
-        colorb = pal[iter].blue;
+        colorr = info->pal[iter].red;
+        colorg = info->pal[iter].green;
+        colorb = info->pal[iter].blue;
       } else {
         colorr = black;
         colorg = black;
@@ -53,15 +77,17 @@ struct ppm_pixel** make_array(struct ppm_pixel* pal, struct ppm_pixel** arr,
       }
 
       //write color to image at location (row, col)
-      arr[j][k].red = colorr;
-      arr[j][k].green = colorg;
-      arr[j][k].blue = colorb;
+      info->arr[j][k].red = colorr;
+      info->arr[j][k].green = colorg;
+      info->arr[j][k].blue = colorb;
     }
   }
  
-  return arr;
+  printf("Thread %lu) finished\n", pthread_self());
+  return (void*) NULL;
 }
 
+//main function
 int main(int argc, char* argv[]) {
   int size = 480;
   float xmin = -2.0;
@@ -69,8 +95,11 @@ int main(int argc, char* argv[]) {
   float ymin = -1.12;
   float ymax = 1.12;
   int maxIterations = 1000;
+  //Designates the number of thread processes.
   int numProcesses = 4;
-
+  //Boundaries for each thread's mandelbrot creation.
+  int startr, endr, startc, endc;
+  
   int opt;
   while ((opt = getopt(argc, argv, ":s:l:r:t:b:p:")) != -1) {
     switch (opt) {
@@ -94,7 +123,7 @@ int main(int argc, char* argv[]) {
   char *dash = "-";
   char sizelet[100];
   sprintf(sizelet, "%d", size);
-  char png[] = ".ppm";
+  char ppm[] = ".ppm";
   time_t timenow = time(0);
   char current[11];
   sprintf(current, "%d", (int)timenow);
@@ -136,9 +165,9 @@ int main(int argc, char* argv[]) {
   //malloc of the array
   array = malloc(sizeof(struct ppm_pixel *) * size);
   
-  for (int i = 0; i < size; i++) {
-    array[i] = malloc(sizeof(struct ppm_pixel) * size);
-    memset(array[i], (int)'\0', size);
+  for (int y = 0; y < size; y++) {
+    array[y] = malloc(sizeof(struct ppm_pixel) * size);
+    memset(array[y], (int)'\0', size);
   }
 
   if (array == NULL) {
@@ -153,9 +182,41 @@ int main(int argc, char* argv[]) {
   gettimeofday(&tstart, NULL);
 
   int start = 0, end = 480;
-  //Calls make_array function to create mandelbrot and store in array
-  array = make_array(palette, array, start, end, start, end);
+  
+  //threads[4], thread IDs
+  pthread_t threads[4];
+  //info[4] creates the structs for multiple arguments to be passed
+  struct thread_data info[4];
+  
+  //for loop for threads to be created and executed.
+  for (int i = 0; i < 4; i++) {
+    if (i == 0) {
+      startr = 0, endr = (size / 2), startc = 0, endc = (size / 2);
+    } else if (i == 1) {
+      startr = (size / 2), endr = size, startc = 0, endc = (size / 2);
+    } else if (i == 2) {
+      startr = 0, endr = (size / 2), startc = (size / 2), endc = size;
+    } else {
+      startr = (size / 2), endr = size, startc = (size / 2), endc = size;
+    }
 
+    //sets up all the multiple arguments values
+    info[i].pal = palette;
+    info[i].arr = array;
+    info[i].sr = startr;
+    info[i].er = endr;
+    info[i].sc = startc;
+    info[i].ec = endc;
+
+    //Creates thread
+    pthread_create(&threads[i], NULL, make_array, (void*) &info[i]);
+  }
+
+  for (int z = 0; z < 4; z++) {
+    //Joins threads
+    pthread_join(threads[z], NULL);
+  }
+  
   //The end time, gets the time for after the mandelbrot array is made
   gettimeofday(&tend, NULL);
 
