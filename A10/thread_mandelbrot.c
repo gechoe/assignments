@@ -48,8 +48,8 @@ void *make_array(void *data) {
   //pixel
   for (int j = info->sr; j < info->er; j++) {
     for (int k = info->sc; k < info->ec; k++) {
-      float xfrac = (float) k / (float)size;
-      float yfrac = (float) j / (float)size;
+      float xfrac = (float) j / (float)size;
+      float yfrac = (float) k / (float)size;
       
       float x0 = xmin + xfrac * (xmax - xmin);
       float y0 = ymin + yfrac * (ymax - ymin);
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
   strcat(name, sizelet);
   strcat(name, dash);
   strcat(name, current);
-  strcat(name, png);
+  strcat(name, ppm);
  
   // generate palette
   //Sets a random seed to ensure that the color palette is different each time
@@ -181,8 +181,6 @@ int main(int argc, char* argv[]) {
   //The start time, gets the time for before the mandelbrot (array/png) is made
   gettimeofday(&tstart, NULL);
 
-  int start = 0, end = 480;
-  
   //threads[4], thread IDs
   pthread_t threads[4];
   //info[4] creates the structs for multiple arguments to be passed

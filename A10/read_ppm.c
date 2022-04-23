@@ -1,3 +1,9 @@
+/**
+ * read_ppm.c
+ * Author: Grace Choe
+ * Date: 4/22/2022
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
