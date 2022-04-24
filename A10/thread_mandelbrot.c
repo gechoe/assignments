@@ -6,6 +6,16 @@
  * Description:
  * This program computes and outputs a PPM image of the mandelbrot set using
  * threads.
+ *
+ * Time it takes to run each size:
+ * Size | Time (s)
+ * 100  | 
+ * 400  |
+ * 480  |
+ * 800  |
+ * 1000 |
+ * 2000 |
+ *
  */
 
 #include <stdio.h>
@@ -26,16 +36,16 @@ struct thread_data {
   int er;
   int sc;
   int ec;
+  int sizes;
+  float xmins;
+  float xmaxs;
+  float ymins;
+  float ymaxs;
+  int maxIts;
 };
 
 //make_array thread's "main" function, computes mandelbrot set portion
 void *make_array(void *data) {
-  int size = 480;
-  float xmin = -2.0;
-  float xmax = 0.47;
-  float ymin = -1.12;
-  float ymax = 1.12;
-  int maxIterations = 1000;
   int colorr, colorg, colorb, black = 0;
   float xtmp = 0;
   
@@ -48,17 +58,17 @@ void *make_array(void *data) {
   //pixel
   for (int j = info->sr; j < info->er; j++) {
     for (int k = info->sc; k < info->ec; k++) {
-      float xfrac = (float) j / (float)size;
-      float yfrac = (float) k / (float)size;
+      float xfrac = (float) j / (float)info->sizes;
+      float yfrac = (float) k / (float)info->sizes;
       
-      float x0 = xmin + xfrac * (xmax - xmin);
-      float y0 = ymin + yfrac * (ymax - ymin);
+      float x0 = info->xmins + xfrac * (info->xmaxs - info->xmins);
+      float y0 = info->ymins + yfrac * (info->ymaxs - info->ymins);
       float x = 0, y = 0;
       int iter = 0;
       
       //while loop creates the fractal like image by assigning a certain iter
       //value which is then used to compute the pixel colors
-      while ((iter < maxIterations) && ((x * x + y * y) < (2 * 2))) {
+      while ((iter < info->maxIts) && ((x * x + y * y) < (2 * 2))) {
         xtmp = (x * x) - (y * y) + x0;
         y = (2 * x * y) + y0;
         x = xtmp;
@@ -66,7 +76,7 @@ void *make_array(void *data) {
       }
 
       //Computes the colors for red, green, and blue
-      if (iter < maxIterations) {
+      if (iter < info->maxIts) {
         colorr = info->pal[iter].red;
         colorg = info->pal[iter].green;
         colorb = info->pal[iter].blue;
@@ -205,6 +215,12 @@ int main(int argc, char* argv[]) {
     info[i].er = endr;
     info[i].sc = startc;
     info[i].ec = endc;
+    info[i].sizes = size;
+    info[i].xmins = xmin;
+    info[i].xmaxs = xmax;
+    info[i].ymins = ymin;
+    info[i].ymaxs = ymax;
+    info[i].maxIts = maxIterations;
 
     //Creates thread
     pthread_create(&threads[i], NULL, make_array, (void*) &info[i]);

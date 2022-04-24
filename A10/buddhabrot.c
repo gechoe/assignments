@@ -21,7 +21,6 @@
 
 //struct for each thread, that way multiple arguents can be taken in pthread_create
 struct thread_data {
-  //struct ppm_pixel* pal;
   struct ppm_pixel** arr;
   int** barr;
   int** count;
@@ -29,6 +28,12 @@ struct thread_data {
   int er;
   int sc;
   int ec;
+  int sizes;
+  float xmins;
+  float xmaxs;
+  float ymins;
+  float ymaxs;
+  int maxIts;
 };
 
 pthread_mutex_t mutex;
@@ -36,12 +41,6 @@ pthread_barrier_t barrier;
 
 //make_array thread's "main" function, computes mandelbrot set portion
 void *make_array(void *data) {
-  int size = 750;
-  float xmin = -2.0;
-  float xmax = 0.47;
-  float ymin = -1.12;
-  float ymax = 1.12;
-  int maxIterations = 1000;
   int colorr, colorg, colorb, black = 0;
   float xtmp = 0;
   
@@ -53,23 +52,23 @@ void *make_array(void *data) {
   //Step 1: Deteremine mandelbrot set membership
   for (int i = info->sr; i < info->er; i++) {
     for (int j = info->sc; j < info->ec; j++) {
-      float xfrac = (float) j / (float) size;
-      float yfrac = (float) i / (float) size;
+      float xfrac = (float) j / (float) info->sizes;
+      float yfrac = (float) i / (float) info->sizes;
       
-      float x0 = xmin + xfrac * (xmax - xmin);
-      float y0 = ymin + yfrac * (ymax - ymin);
+      float x0 = info->xmins + xfrac * (info->xmaxs - info->xmins);
+      float y0 = info->ymins + yfrac * (info->ymaxs - info->ymins);
 
       float x = 0, y = 0;
       int iter = 0;
 
-      while ((iter < maxIterations) && ((x * x + y * y) < (2 * 2))) {
+      while ((iter < info->maxIts) && ((x * x + y * y) < (2 * 2))) {
         xtmp = (x * x) - (y * y) + x0;
         y = 2 * x * y + y0;
         x = xtmp;
         iter++;
       }
 
-      if (iter < maxIterations) { //escaped
+      if (iter < info->maxIts) { //escaped
         info->barr[i][j] = 0; //membership = false
       } else {
         info->barr[i][j] = 1; //membership = true
@@ -82,48 +81,36 @@ void *make_array(void *data) {
   //Step 2: Compute visited counts
   for (int i = info->sr; i < info->er; i++) {
     for (int j = info->sc; j < info->ec; j++) {
-      if (info->barr[i][j] == 0) {
-        float xfrac = (float) j / (float) size;
-        float yfrac = (float) i / (float) size;
+      if (info->barr[i][j] == 1) continue;
+
+      float xfrac = (float) j / (float) info->sizes;
+      float yfrac = (float) i / (float) info->sizes;
         
-        float x0 = xmin + xfrac * (xmax - xmin);
-        float y0 = ymin + yfrac * (ymax - ymin);
+      float x0 = info->xmins + xfrac * (info->xmaxs - info->xmins);
+      float y0 = info->ymins + yfrac * (info->ymaxs - info->ymins);
 
-        float x = 0, y = 0;
+      float x = 0, y = 0;
 
-        while (((x * x) + (y * y)) < (2 * 2)) {
-          xtmp = (x * x) - (y * y) + x0;
-          y = (2 * x * y) + y0;
-          x = xtmp;
+      while (((x * x) + (y * y)) < (2 * 2)) {
+        xtmp = (x * x) - (y * y) + x0;
+        y = (2 * x * y) + y0;
+        x = xtmp;
 
-          int yrow = round(size * (y - ymin) / (ymax - ymin));
-          int xcol = round(size * (x - xmin) / (xmax - xmin));
+        int yrow = round(info->sizes * (y - info->ymins) / (info->ymaxs - info->ymins));
+        int xcol = round(info->sizes * (x - info->xmins) / (info->xmaxs - info->xmins));
           
-          if ((yrow < 0) || (yrow >= size)) continue; //out of range
-          if ((xcol < 0) || (xcol >= size)) continue; //out of range
+        if ((yrow < 0) || (yrow >= info->sizes)) continue; //out of range
+        if ((xcol < 0) || (xcol >= info->sizes)) continue; //out of range
           
-          pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(&mutex);
 
-          if (size < 200) {
-            info->count[yrow][xcol]++;
-          } else if (size < 500) {
-            info->count[yrow][xcol] += 2;
-          } else if (size < 800) {
-            info->count[yrow][xcol] += 4;
-          } else if (size < 1000) {
-            info->count[yrow][xcol] += 6;
-          } else if (size < 1300) {
-            info->count[yrow][xcol] += 8;
-          } else if (size < 1700) {
-            info->count[yrow][xcol] += 10;
-          } else {
-            info->count[yrow][xcol] += 12;
-          }
-          //info->count[yrow][xcol] += 2;
-          max_count++;
-
-          pthread_mutex_unlock(&mutex);
+        info->count[yrow][xcol]++;
+        
+        if (info->count[yrow][xcol] > max_count) {
+          max_count = info->count[yrow][xcol];
         }
+
+        pthread_mutex_unlock(&mutex);
       }
     }
   }
@@ -160,7 +147,7 @@ void *make_array(void *data) {
 }
 
 int main(int argc, char* argv[]) {
-  int size = 750;
+  int size = 480;
   float xmin = -2.0;
   float xmax = 0.47;
   float ymin = -1.12;
@@ -243,14 +230,7 @@ int main(int argc, char* argv[]) {
     printf("ERROR: malloc failed\n");
     exit(1);
   }
-/*
-  for (int m = 0; m < size; m++) {
-    for (int n = 0; n < size; n++) {
-      
-      counts[m][n] = 0;
-    }
-  }
-*/
+  
   double timer;
   struct timeval tstart, tend;
 
@@ -282,6 +262,12 @@ int main(int argc, char* argv[]) {
     info[i].er = endr;
     info[i].sc = startc;
     info[i].ec = endc;
+    info[i].sizes = size;
+    info[i].xmins = xmin;
+    info[i].xmaxs = xmax;
+    info[i].ymins = ymin;
+    info[i].ymaxs = ymax;
+    info[i].maxIts = maxIterations;
 
     //Creates thread
     pthread_create(&threads[i], NULL, make_array, (void*) &info[i]);
