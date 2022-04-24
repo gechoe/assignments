@@ -5,6 +5,15 @@
  *
  * Description:
  * This program computes and outputs a PPM image of the buddhabrot.
+ *
+ * Time it takes to run each size:
+ * Size | Time (s)
+ * 100  | 0.67439 s
+ * 400  | 6.97021 s
+ * 480  | 9.98745 s
+ * 800  | 27.1499 s
+ * 1000 | 42.2346 s
+ * 2000 | 167.931 s
  */
 
 #include <stdio.h>
