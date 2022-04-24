@@ -9,13 +9,12 @@
  *
  * Time it takes to run each size:
  * Size | Time (s)
- * 100  | 
- * 400  |
- * 480  |
- * 800  |
- * 1000 |
- * 2000 |
- *
+ * 100  | 0.584169 s
+ * 400  | 6.0364 s
+ * 480  | 8.62724 s
+ * 800  | 23.5049 s
+ * 1000 | 36.4207 s
+ * 2000 | 145.294 s
  */
 
 #include <stdio.h>
@@ -58,8 +57,8 @@ void *make_array(void *data) {
   //pixel
   for (int j = info->sr; j < info->er; j++) {
     for (int k = info->sc; k < info->ec; k++) {
-      float xfrac = (float) j / (float)info->sizes;
-      float yfrac = (float) k / (float)info->sizes;
+      float xfrac = (float) k / (float)info->sizes;
+      float yfrac = (float) j / (float)info->sizes;
       
       float x0 = info->xmins + xfrac * (info->xmaxs - info->xmins);
       float y0 = info->ymins + yfrac * (info->ymaxs - info->ymins);
