@@ -15,6 +15,58 @@
 #include <sys/time.h>
 #include "read_ppm.h"
 
+//make_array function
+//Creates the mandelbrot array by filling it with colors
+void make_array(struct ppm_pixel** arr, struct ppm_pixel* pal,
+  int startrow, int endrow, int startcol, int endcol) {
+  int size = 480;
+  float xmin = -2.0;
+  float xmax = 0.47;
+  float ymin = -1.12;
+  float ymax = 1.12;
+  int maxIterations = 1000;
+  int colorr, colorg, colorb, black = 0;
+  float xtmp = 0;
+
+  //For loop within for loop to assign red, green, blue pixel colors for each
+  //pixel
+  for (int r = startrow; r < endrow; r++) {
+    for (int c = startcol; c < endcol; c++) {
+      float xfrac = (float) c / (float)size;
+      float yfrac = (float) r / (float)size;
+        
+      float x0 = xmin + xfrac * (xmax - xmin);
+      float y0 = ymin + yfrac * (ymax - ymin);
+      float x = 0, y = 0;
+      int iter = 0;
+
+      //while loop creates the fractal like image by assigning a certain iter
+      //value which is then used to compute the pixel colors
+      while ((iter < maxIterations) && ((x * x + y * y) < (2 * 2))) {
+        xtmp = (x * x) - (y * y) + x0;
+        y = (2 * x * y) + y0;
+        x = xtmp;
+        iter++;
+      }
+
+      //Computes the colors for red, green, and blue
+      if (iter < maxIterations) {
+        colorr = pal[iter].red;
+        colorg = pal[iter].green;
+        colorb = pal[iter].blue;
+      } else {
+        colorr = black;
+        colorg = black;
+        colorb = black;
+      }
+      
+      arr[r][c].red = colorr;
+      arr[r][c].green = colorg;
+      arr[r][c].blue = colorb;
+    }
+  }
+}
+
 int main(int argc, char* argv[]) {
   int size = 480;
   float xmin = -2.0;
@@ -39,22 +91,6 @@ int main(int argc, char* argv[]) {
   printf("  Y range = [%.4f,%.4f]\n", ymin, ymax);
 
   // todo: your work here
-  //file name parts
-  char name[100] = "mandelbrot-";
-  char *dash = "-";
-  char sizelet[100];
-  sprintf(sizelet, "%d", size);
-  char png[] = ".ppm";
-  time_t timenow = time(0);
-  char current[11];
-  sprintf(current, "%d", (int)timenow);
-
-  //Creates file name
-  strcat(name, sizelet);
-  strcat(name, dash);
-  strcat(name, current);
-  strcat(name, png);
- 
   // generate palette
   //Sets a random seed to ensure that the color palette is different each time
   srand(time(0));  
@@ -81,16 +117,16 @@ int main(int argc, char* argv[]) {
 
   // compute image
   //2d array to hold the mandelbrot fractal's pixel values
-  struct ppm_pixel **array;
+  struct ppm_pixel **image_array;
 
   //malloc of the array
-  array = malloc(sizeof(struct ppm_pixel *) * size);
+  image_array = malloc(sizeof(struct ppm_pixel *) * size);
   
   for (int i = 0; i < size; i++) {
-    array[i] = malloc(sizeof(struct ppm_pixel) * size);
+    image_array[i] = malloc(sizeof(struct ppm_pixel) * size);
   }
 
-  if (array == NULL) {
+  if (image_array == NULL) {
     printf("ERROR: malloc failed\n");
     exit(1);
   }
@@ -101,68 +137,32 @@ int main(int argc, char* argv[]) {
   //The start time, gets the time for before the mandelbrot (array/png) is made
   gettimeofday(&tstart, NULL);
 
-  int colorr, colorg, colorb, black = 0;
-  float xtmp = 0;
-
-  //For loop within for loop to assign red, green, blue pixel colors for each
-  //pixel
-  for (int j = 0; j < size; j++) {
-    for (int k = 0; k < size; k++) {
-      float xfrac = (float) k / (float)size;
-      float yfrac = (float) j / (float)size;
-      
-      float x0 = xmin + xfrac * (xmax - xmin);
-      float y0 = ymin + yfrac * (ymax - ymin);
-      float x = 0, y = 0;
-      int iter = 0;
-      
-      //while loop creates the fractal like image by assigning a certain iter
-      //value which is then used to compute the pixel colors
-      while ((iter < maxIterations) && ((x * x + y * y) < (2 * 2))) {
-        xtmp = (x * x) - (y * y) + x0;
-        y = (2 * x * y) + y0;
-        x = xtmp;
-        iter++;
-      }
-
-      //Computes the colors for red, green, and blue
-      if (iter < maxIterations) {
-        colorr = palette[iter].red;
-        colorg = palette[iter].green;
-        colorb = palette[iter].blue;
-      } else {
-        colorr = black;
-        colorg = black;
-        colorb = black;
-      }
-
-      //write color to image at location (row, col)
-      array[j][k].red = colorr;
-      array[j][k].green = colorg;
-      array[j][k].blue = colorb;
-    }
-  }
+  //Uses the make_array function to make mandelbrot color array
+  make_array(image_array, palette, 0, size, 0, size);
 
   //The end time, gets the time for after the mandelbrot array is made
   gettimeofday(&tend, NULL);
 
+  //name array holds the created name of the file
+  char name[1024];
+  snprintf(name, 1024, "mandelbrot-%d-%lu.ppm", size, time(0));
   //Write the computed mandelbrot into a png file
-  write_ppm(name, array, size, size);
+  write_ppm(name, image_array, size, size);
   
   //timer, calculates the total time the process took
   timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
-  printf("Computer mandelbrot set (%dx%d) in %g seconds\n", size, size, timer);
+  printf("Computed mandelbrot set (%dx%d) in %g seconds\n", size, size, timer);
   printf("Writing file: %s\n", name);
 
   //Frees the arrays within the array (2D array)
   for (int m = 0; m < size; m++) {
-    free(array[m]);
-    array[m] = NULL;
+    free(image_array[m]);
+    image_array[m] = NULL;
   }
   
   //Frees the final outer array
-  free(array);
-  array = NULL;
+  free(image_array);
+  image_array = NULL;
 
   //Frees the palette array
   free(palette);
