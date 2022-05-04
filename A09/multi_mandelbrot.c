@@ -151,6 +151,7 @@ int main(int argc, char* argv[]) {
   }
 
   //timer
+  double timer;
   struct timeval tstart, tend;
   int startr, endr, startc, endc;
 
@@ -200,6 +201,10 @@ int main(int argc, char* argv[]) {
   char name[1024];
   snprintf(name, 1024, "multi-mandelbrot-%d-%lu.ppm", size, time(0));
   write_ppm(name, image_array, size, size);
+
+  //timer, calculates the total time the process took
+  timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
+  printf("Computer mandelbrot set (%dx%d) in %g seconds\n", size, size, timer);
   printf("Writing file: %s\n", name);
   
   //frees image_array
