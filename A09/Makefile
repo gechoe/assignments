@@ -9,7 +9,7 @@ single_mandelbrot: single_mandelbrot.c read_ppm.c
 
 multi_mandelbrot: multi_mandelbrot.c read_ppm.c
 	$(CC) -g -Wall -Wvla -Werror -Wno-unused-variable multi_mandelbrot.c read_ppm.c -o $@ -lm
-
+ 
 multi-4-colored: multi-4-colored.c read_ppm.c
 	$(CC) -g -Wall -Wvla -Werror -Wno-unused-variable multi-4-colored.c read_ppm.c -o $@ -lm
 
