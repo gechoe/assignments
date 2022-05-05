@@ -69,6 +69,12 @@ void make_array(struct ppm_pixel** arr, struct ppm_pixel* pal,
       arr[r][c].blue = colorb;
     }
   }
+
+  free(pal);
+  pal = NULL;
+
+  free(arr);
+  arr = NULL;
 }
 
 int main(int argc, char* argv[]) {
