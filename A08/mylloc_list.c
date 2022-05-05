@@ -7,12 +7,10 @@ struct chunk {
   int mem_used;
   struct chunk *next;
 };
-
 struct chunk *flist = NULL;
-int total = 0, freed = 0, used = 0;
 
 void *malloc (size_t size) {
-  if (size == 0){
+  if (size == 0) {
     return NULL;
   }
 
@@ -20,128 +18,109 @@ void *malloc (size_t size) {
   struct chunk *prev = NULL;
 
   while (next != NULL) {
-    total++;
-
-    if (next->size >= size) {
+    if (next -> size >= size) {
       if (prev != NULL) {
-        next->mem_used = size;
         prev->next = next->next;
-        freed++;
       } else {
         flist = next->next;
-        used++;
       }
       return (void*)(next + 1);
     } else {
       prev = next;
-      next = next->next;
+      next = next -> next;
     }
   }
 
-  /*use sbrk to allocate new memory*/
   void *memory = sbrk(size + sizeof(struct chunk));
-  if (memory == (void *) -1) {
+  if (memory == (void *) - 1) {
     return NULL;
   } else {
-    struct chunk* cnk = (struct chunk*) memory;
+    struct chunk *cnk = (struct chunk*)memory;
     cnk->size = size;
     cnk->mem_used = size;
-    
-    return (void*)(cnk + 1);
+    return (void *)(cnk + 1);
   }
 }
 
 void free(void *memory) {
   if (memory != NULL) {
-   /*we're jumping back one chunk position*/
-    struct chunk *cnk = (struct chunk*)((struct chunk*)memory - 1);
+    struct chunk *cnk = (struct chunk*)((struct chunk*)memory -1);
     cnk->next = flist;
-    cnk->mem_used = 0;
     flist = cnk;
-    freed++;
-    cnk->mem_used = 0;
   }
-
   return;
 }
 
 void fragstats(void* buffers[], int len) {
-  int l = 0, mem = 0, memm, mem_total = 0, large, small;
+  //Total blocks for free chunks and in-use chunks
+  int total_usedc = 0, total_freec = 0;
+  //The largest and smallest unused memory across all used chunks
+  int small_unuse = 0, large_unuse = 0;
+  //The total unused memory across all used chunks and unused_mem for each chunk
+  int total_unuse = 0, unuse = 0;
+  //The largest and smallest sizes across all free chunks
+  int small_free = 0, large_free = 0;
 
+  struct chunk *cnk;
+
+  //for loop
+  //Checks all used chunks to find unused then unused's smallest, largest,
+  //total, etc.
   for (int k = 0; k < len; k++) {
-    if (buffers[k]) {
-      l++;
-      mem = *((int*)buffers[k]);
-      mem_total += mem;
-      
-      if (k == 0) {
-        memm = mem;
+    if (buffers[k] != NULL) {
+      total_usedc++;
+      cnk = (struct chunk*)(buffers[k] - 1);
+      //finds unused using used and size
+      unuse = (cnk->size) - (cnk->mem_used);
+      total_unuse = total_unuse + unuse;
+
+      //if statement, to find the largest unused
+      if (unuse > large_unuse) {
+        large_unuse = unuse;
       }
-      if (mem < memm) {
-        if (memm >= large) {
-          large = memm;
-        }
-        if (mem <= small) {
-          small = mem;
-        }
-      } else if (mem > memm) {
-        if (mem >= large) {
-          large = mem;
-        }
-        if (memm <= small) {
-          small = memm;
-        }
-      } else {
-        small = mem;
-        large = mem;
+
+      //if statement to find the smallest unused
+      if ((small_unuse == 0) || (unuse < small_unuse)) {
+        small_unuse = unuse;
       }
     }
-    memm = mem;
   }
-  float aver = mem_total / l;
- 
-  struct chunk *cnk = flist, *prev = NULL;
-  int largest, smallest, i = 0, unt = 0, unu;
 
-  while (cnk != NULL) {
-    i++;
-    
-    int t = cnk->size;
-    int u = cnk->mem_used;
-    int un = t - u;
+  //The average unused memory across all used chunks
+  float aver_unuse = total_unuse / total_usedc;
 
-    if (prev != NULL) {
-      if (un <= unu) {
-        if (unu >= largest) {
-          largest = unu;
-        }
-        if (un <= smallest) {
-          smallest = un;
-        }
-      } else {
-        if (un >= largest) {
-          largest = un;
-        }
-        if (unu <= smallest) {
-          smallest = unu;
-        }
-      }
-    } else {
-      smallest = un;
-      largest = un;
+  struct chunk *fl = flist;
+  int total_free = 0;
+
+  //while loop
+  //Checks all free chunks to find smallest, largest, total, etc.
+  while (fl != NULL) {
+    total_freec++;
+    total_free = total_free + fl->size;
+
+    //if statement to find the largest free
+    if (fl->size > large_free) {
+      large_free = fl->size;
     }
 
-    unu = un;
-    unt += un;
-    
-    prev = cnk;
-    cnk = cnk->next;
+    //if statement to find the smallest free
+    if ((small_free == 0) || (fl->size < small_free)) {
+      small_free = fl->size;
+    }
+
+    fl = fl->next;
   }
-  
-  float av = unt / i;  
-  printf("Total blocks: %d Free: %d Used: %d\n", (i + l), i, l);
-  printf("External unused: total: %d, average: %.1f, smallest: %d, largest: %d\n",
-     mem_total, aver, small, large);
-  printf("Internal unused: total: %d, average: %.1f, smallest: %d, largest: %d\n",
-     unt, av, smallest, largest);
+
+  //The average sizes os all free chunks  
+  float aver_free = total_free / total_freec;
+
+  //The amount of total_blocks (free chunks + used chunks)
+  int total_blocks = total_usedc + total_freec;
+
+  printf("Total blocks: %d Free: %d Used: %d\n", total_blocks, total_freec,
+    total_usedc);
+  printf("Internal unused: total: %d average: %.1f smallest: %d largest: %d\n",
+    total_unuse, aver_unuse, small_unuse, large_unuse);
+  printf("External unused: total: %d average: %.1f smallest: %d largest: %d\n",
+    total_free, aver_free, small_free, large_free);
 }
