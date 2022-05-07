@@ -4,7 +4,7 @@
  * Date: 4/15/2022
  *
  * Description:
- * This program writes a mandelbrot png file using multiple (four) child 
+ * This program writes a mandelbrot ppm file using multiple (four) child 
  * processes using fork.
  */
 
@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
   printf("  Y range = [%.4f,%.4f]\n", ymin, ymax);
 
   // todo: your code here
-  // generate pallet
+  // generate palette
   //Sets a random seed to ensure that the color palette is different each time
   srand(time(0));
 
