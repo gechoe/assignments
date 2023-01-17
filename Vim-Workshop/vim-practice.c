@@ -1,6 +1,7 @@
 /*
  * Grace Choe
  * My motto: When life gives lemons, make lemonade! ~(OuO)~
+ * Vim Practice
  */
 
 #include <stdio.h>
